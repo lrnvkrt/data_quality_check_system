@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  grpc-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: validator
+    networks:
+      - dqcs-net
+    restart: unless-stopped
+    command: ["python", "main_grpc.py"] 
+
+networks:
+  dqcs-net:
+    external: true
