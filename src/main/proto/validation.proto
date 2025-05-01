@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package app.grpc;
+
+
+import "google/protobuf/struct.proto";
+
+service ValidationService {
+  rpc Validate (ValidationRequest) returns (ValidationResponse);
+}
+
+message ValidationRequest {
+  repeated Record data = 1;
+  ExpectationSuite expectation_suite = 2;
+}
+
+message Record {
+  map<string, FieldValue> fields = 1;
+}
+
+message FieldValue {
+  oneof value {
+    string string_value = 1;
+    int64 int_value = 2;
+    double double_value = 3;
+    bool bool_value = 4;
+    ListValue list_value = 5;
+    StructValue struct_value = 6;
+  }
+}
+
+message ListValue {
+  repeated FieldValue values = 1;
+}
+
+message StructValue {
+  map<string, FieldValue> fields = 1;
+}
+
+message ExpectationSuite {
+  string expectation_suite_name = 1;
+  repeated Expectation expectations = 2;
+}
+
+message Expectation {
+  string expectation_type = 1;
+  map<string, KwargValue> kwargs = 2;
+  map<string, string> meta = 3;
+}
+
+message KwargValue {
+  oneof value {
+    string string_value = 1;
+    int64 int_value = 2;
+    double double_value = 3;
+    bool bool_value = 4;
+    ListValue list_value = 5;
+    StructValue struct_value = 6;
+  }
+}
+
+message ValidationResponse {
+  bool success = 1;
+  uint32 evaluated_expectations = 2;
+  uint32 successful_expectations = 3;
+  uint32 unsuccessful_expectations = 4;
+  repeated ExpectationResult results = 5;
+}
+
+message ExpectationResult {
+  string expectation_type = 1;
+  bool success = 2;
+  string column = 3;
+  string error_message = 4;
+  repeated uint32 failed_row_indices = 5;
+}
