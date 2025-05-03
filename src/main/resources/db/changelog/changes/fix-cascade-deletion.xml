@@ -1,0 +1,34 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="fix-fk-cascade-deletion" author="dataqualityservice">
+        <dropForeignKeyConstraint
+                baseTableName="field"
+                constraintName="fk_field_data_source"/>
+
+        <addForeignKeyConstraint
+                baseTableName="field"
+                baseColumnNames="data_source_id"
+                referencedTableName="data_source"
+                referencedColumnNames="id"
+                constraintName="fk_field_data_source"
+                onDelete="CASCADE"/>
+
+        <dropForeignKeyConstraint
+                baseTableName="expectation"
+                constraintName="fk_expectation_field"/>
+
+        <addForeignKeyConstraint
+                baseTableName="expectation"
+                baseColumnNames="field_id"
+                referencedTableName="field"
+                referencedColumnNames="id"
+                constraintName="fk_expectation_field"
+                onDelete="CASCADE"/>
+
+    </changeSet>
+</databaseChangeLog>
