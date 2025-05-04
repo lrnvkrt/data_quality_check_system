@@ -86,3 +86,47 @@ Content-Type: application/json
   },
   "enabled": true
 }
+
+
+### Валидация батча
+POST http://localhost:8080/batch/ecom.order.placed
+Content-Type: application/json
+
+[
+  {
+    "topic": "ecom.order.placed",
+    "payload": {
+      "userId": "9d0da8b5-2dcb-46a6-ba70-63a5bff3c3e9",
+      "createdAt": 1747170987.0629097,
+      "quantity": -10,
+      "totalAmount": 25.480760230559888,
+      "shippingAddress": {
+        "country": "Germany",
+        "city": "Berlin",
+        "postalCode": "INVALID",
+        "street": "Alexanderplatz 1"
+      }
+    }
+  },
+  {
+    "topic": "ecom.order.placed",
+    "payload": {
+      "userId": "12345678-aaaa-bbbb-cccc-1234567890ab",
+      "createdAt": 1747170990.123456,
+      "items": [
+        {
+          "productId": "abcdef12-3456-7890-abcd-ef1234567890",
+          "quantity": 1,
+          "unitPrice": 100.0
+        }
+      ],
+      "totalAmount": 100.0,
+      "shippingAddress": {
+        "country": "Germany",
+        "city": "Munich",
+        "postalCode": "80331",
+        "street": "Marienplatz 1"
+      }
+    }
+  }
+]
