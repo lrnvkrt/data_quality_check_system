@@ -28,7 +28,36 @@ services:
       - ch_logs:/var/log/clickhouse-server
       - ./clickhouse-init:/docker-entrypoint-initdb.d
 
+  prometheus:
+    container_name: local-prometheus
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: local-push-gateway
+    ports:
+      - "9091:9091"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: default
+      GF_SECURITY_ADMIN_PASSWORD: default
+    depends_on:
+      - prometheus
+
 volumes:
+  grafana-storage:
   pg_data:
   ch_data:
   ch_logs:

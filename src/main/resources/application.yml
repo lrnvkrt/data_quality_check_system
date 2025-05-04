@@ -27,3 +27,7 @@ grpc:
   validation:
     host: ${VALIDATION_HOST}
     port: ${VALIDATION_PORT}
+
+metrics:
+  pushgateway:
+    host: ${PUSHGATEWAY_HOST}

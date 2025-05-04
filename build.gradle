@@ -45,6 +45,10 @@ dependencies {
     implementation 'com.clickhouse:clickhouse-jdbc:0.8.2'
     implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
 
+    // prometheus
+    implementation 'io.prometheus:simpleclient:0.16.0'
+    implementation 'io.prometheus:simpleclient_pushgateway:0.16.0'
+
     // gRPC client
     runtimeOnly 'io.grpc:grpc-netty-shaded:1.72.0'
     implementation 'io.grpc:grpc-protobuf:1.72.0'
