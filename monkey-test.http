@@ -130,3 +130,27 @@ Content-Type: application/json
     }
   }
 ]
+
+
+
+### Список всех топиков с оценкой общего качества данных
+GET http://localhost:8080/analytics/topics
+
+
+### Статистика ошибок по каждому полю и правилу в конретном топике
+GET http://localhost:8080/analytics/topics/ecom.order.placed/fields
+
+### Показывает динамику ошибок по топику
+GET http://localhost:8080/analytics/topics/test.topic/trend?interval=hourly
+
+### Возвращает примеры сломанных значений в топике
+GET http://localhost:8080/analytics/topics/test.topic/examples
+
+### Возвращает список всех правил с оценкой их эффективности
+GET http://localhost:8080/analytics/rules
+
+### Показывает как конкретное правило работает во времени
+GET http://localhost:8080/analytics/rules/2d31caed-215c-44c6-8adc-ca2921f80608/trend?interval=hourly
+
+### Показывает конкретные значения которые регулярно проваливаются под конкретным правилом
+GET http://localhost:8080/analytics/rules/2d31caed-215c-44c6-8adc-ca2921f80608/examples
