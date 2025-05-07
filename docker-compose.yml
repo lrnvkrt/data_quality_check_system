@@ -1,0 +1,111 @@
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: local-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      local-net:
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: local-clickhouse
+    restart: unless-stopped
+    ports:
+      - "${CLICKHOUSE_PORT}:8123"
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+    volumes:
+      - ch_data:/var/lib/clickhouse
+      - ch_logs:/var/log/clickhouse-server
+      - ./clickhouse-init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      local-net:
+
+
+  prometheus:
+    container_name: local-prometheus
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      local-net:
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: local-push-gateway
+    ports:
+      - "9091:9091"
+    networks:
+      local-net:
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: default
+      GF_SECURITY_ADMIN_PASSWORD: default
+    depends_on:
+      - prometheus
+    networks:
+      local-net:
+
+  dqcs:
+    container_name: dqcs
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST}
+      CLICKHOUSE_PORT: ${CLICKHOUSE_PORT}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+
+      VALIDATION_HOST: ${VALIDATION_HOST}
+      VALIDATION_PORT: ${VALIDATION_PORT}
+
+      PUSHGATEWAY_HOST: ${PUSHGATEWAY_HOST}
+    depends_on:
+      - pushgateway
+      - clickhouse
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - dqcs-net
+      - local-net
+
+networks:
+  dqcs-net:
+    external: true
+  local-net:
+
+volumes:
+  grafana-storage:
+  pg_data:
+  ch_data:
+  ch_logs:
