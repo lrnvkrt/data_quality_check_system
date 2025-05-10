@@ -1,6 +1,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/layout/Navbar'
+import ExpectationManagementPage from './pages/ExpectationManagementPage'
 import DataSourceManagementPage from "./pages/DataSourceManagmentPage.jsx";
 
 export default function App() {
@@ -8,6 +9,7 @@ export default function App() {
         <>
             <Navbar />
             <Routes>
+                <Route path="/expectations/manage" element={<ExpectationManagementPage />} />
                 <Route path="/datasource/manage" element={<DataSourceManagementPage />} />
             </Routes>
         </>
