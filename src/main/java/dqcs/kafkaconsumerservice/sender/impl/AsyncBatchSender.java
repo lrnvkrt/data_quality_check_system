@@ -1,6 +1,7 @@
 package dqcs.kafkaconsumerservice.sender.impl;
 
 import dqcs.kafkaconsumerservice.client.ValidatorClient;
+import dqcs.kafkaconsumerservice.exception.KafkaBatchProcessingException;
 import dqcs.kafkaconsumerservice.messaging.dto.GenericEvent;
 import dqcs.kafkaconsumerservice.messaging.registry.TopicBufferRegistry;
 import dqcs.kafkaconsumerservice.sender.BatchSender;
@@ -52,6 +53,7 @@ public class AsyncBatchSender implements BatchSender {
             logger.info("Sent {} events to topic {} (overflow)", batch.size(), topic);
         } catch (Exception e) {
             logger.error("Overflow send failed for topic {}: {}, batch size {}", topic, e.getMessage(), batch.size(), e);
+            throw new KafkaBatchProcessingException(topic, e);
         }
     }
 }

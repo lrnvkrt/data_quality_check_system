@@ -1,6 +1,7 @@
 package dqcs.kafkaconsumerservice.messaging.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import dqcs.kafkaconsumerservice.exception.KafkaBatchProcessingException;
 import dqcs.kafkaconsumerservice.messaging.dto.GenericEvent;
 import dqcs.kafkaconsumerservice.messaging.registry.TopicBufferRegistry;
 import dqcs.kafkaconsumerservice.sender.BatchSender;
@@ -43,9 +44,14 @@ public class MultiTopicKafkaListener {
 
             GenericEvent genericEvent = new GenericEvent(topic, event);
 
-            bufferRegistry.offer(topic, genericEvent, drainedBatch ->
-                    batchSender.sendBatch(topic, drainedBatch)
-            );
+            bufferRegistry.offer(topic, genericEvent, drainedBatch -> {
+                try {
+                    batchSender.sendBatch(topic, drainedBatch);
+                } catch (Exception e) {
+                    logger.error("Failed to send batch for topic {}: {}", topic, e.getMessage(), e);
+                    throw new KafkaBatchProcessingException(topic, e);
+                }
+            });
         }
     }
 }

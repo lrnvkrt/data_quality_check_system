@@ -2,6 +2,7 @@ package dqcs.kafkaconsumerservice.messaging.registry;
 
 import dqcs.kafkaconsumerservice.config.kafka.properties.KafkaTopicProperties;
 import dqcs.kafkaconsumerservice.config.kafka.properties.TopicConfig;
+import dqcs.kafkaconsumerservice.exception.EventBufferOverflowException;
 import dqcs.kafkaconsumerservice.exception.TopicNotConfiguredException;
 import dqcs.kafkaconsumerservice.messaging.dto.GenericEvent;
 import jakarta.annotation.PostConstruct;
@@ -49,7 +50,12 @@ public class TopicBufferRegistry {
                 List<GenericEvent> overflowBatch = new ArrayList<>();
                 queue.drainTo(overflowBatch);
                 logger.warn("Buffer for topic {} overflowed. Draining {} events", topic, overflowBatch.size());
-                onOverflowFlush.accept(overflowBatch);
+                try {
+                    onOverflowFlush.accept(overflowBatch);
+                } catch (Exception e) {
+                    logger.error("Failed to flush overflow batch for topic {}: {}", topic, e.getMessage(), e);
+                    throw new EventBufferOverflowException(topic, e);
+                }
                 return false;
             }
             return true;
@@ -68,6 +74,10 @@ public class TopicBufferRegistry {
     }
 
     public int getBatchSize(String topic) {
-        return kafkaTopicProperties.getTopics().stream().filter(t -> t.name().equals(topic)).findFirst().orElseThrow().capacity();
+        return kafkaTopicProperties.getTopics().stream()
+                .filter(t -> t.name().equals(topic))
+                .findFirst()
+                .map(TopicConfig::capacity)
+                .orElseThrow(() -> new TopicNotConfiguredException(topic));
     }
 }
