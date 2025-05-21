@@ -3,6 +3,7 @@ package dqcs.kafkaconsumerservice.sender.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dqcs.kafkaconsumerservice.client.ValidatorClient;
+import dqcs.kafkaconsumerservice.exception.KafkaBatchProcessingException;
 import dqcs.kafkaconsumerservice.messaging.dto.GenericEvent;
 import dqcs.kafkaconsumerservice.messaging.registry.TopicBufferRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,14 +60,18 @@ class AsyncBatchSenderTest {
         }
 
         @Test
-        @DisplayName("should catch and log exception if sending fails")
-        void shouldCatchExceptionWhenSendingFails() throws Exception {
+        @DisplayName("should throw KafkaBatchProcessingException if sending fails")
+        void shouldThrowKafkaBatchProcessingExceptionWhenSendingFails() throws Exception {
             String topic = "test-topic";
             List<GenericEvent> batch = List.of(createEvent(topic, "{\"key\":\"error\"}"));
-            doThrow(new RuntimeException("Validation error"))
+
+            doThrow(new RuntimeException("Error while processing batch for topic: test-topic"))
                     .when(validatorClient).sendBatch(anyString(), anyList());
-            assertThatCode(() -> asyncBatchSender.sendBatch(topic, batch))
-                    .doesNotThrowAnyException();
+
+            assertThatThrownBy(() -> asyncBatchSender.sendBatch(topic, batch))
+                    .isInstanceOf(KafkaBatchProcessingException.class)
+                    .hasMessageContaining("test-topic");
+
             verify(validatorClient).sendBatch(topic, batch);
         }
     }
