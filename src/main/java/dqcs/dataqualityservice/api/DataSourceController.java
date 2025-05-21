@@ -3,6 +3,7 @@ package dqcs.dataqualityservice.api;
 import dqcs.dataqualityservice.api.dto.DataSourceCreateRequest;
 import dqcs.dataqualityservice.api.dto.DataSourceDto;
 import dqcs.dataqualityservice.application.DataSourceService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class DataSourceController {
     }
 
     @PostMapping
-    public UUID createDataSource(@RequestBody DataSourceCreateRequest ds) {
+    public UUID createDataSource(@Valid @RequestBody DataSourceCreateRequest ds) {
         return dataSourceService.create(ds);
     }
 

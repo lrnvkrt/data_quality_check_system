@@ -3,6 +3,7 @@ package dqcs.dataqualityservice.api;
 import dqcs.dataqualityservice.api.dto.ExpectationCreateRequest;
 import dqcs.dataqualityservice.api.dto.ExpectationDto;
 import dqcs.dataqualityservice.application.ExpectationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class ExpectationController {
 
     @PostMapping
     public UUID create(
+            @Valid
             @PathVariable UUID fieldId,
             @RequestBody ExpectationCreateRequest expectationCreateRequest
     ) {

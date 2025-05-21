@@ -2,6 +2,8 @@ package dqcs.dataqualityservice.application.impl;
 
 import dqcs.dataqualityservice.api.dto.FieldCreateRequest;
 import dqcs.dataqualityservice.api.dto.FieldDto;
+import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
+import dqcs.dataqualityservice.application.exception.FieldNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;
 import dqcs.dataqualityservice.infrastructure.entity.Field;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;
@@ -64,8 +66,7 @@ class FieldServiceImplTest {
             when(dataSourceRepository.findById(dataSourceId)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> fieldService.addField(dataSourceId, request))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("DataSource not found");
+                    .isInstanceOf(DataSourceNotFoundException.class);
         }
     }
 
@@ -126,8 +127,7 @@ class FieldServiceImplTest {
             when(fieldRepository.findById(fieldId)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> fieldService.getField(fieldId))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("Field not found");
+                    .isInstanceOf(FieldNotFoundException.class);
         }
     }
 
@@ -139,6 +139,9 @@ class FieldServiceImplTest {
         @DisplayName("should call deleteById on repository")
         void shouldDeleteField() {
             UUID fieldId = UUID.randomUUID();
+
+            when(fieldRepository.existsById(fieldId)).thenReturn(true);
+
             fieldService.deleteField(fieldId);
 
             verify(fieldRepository).deleteById(fieldId);

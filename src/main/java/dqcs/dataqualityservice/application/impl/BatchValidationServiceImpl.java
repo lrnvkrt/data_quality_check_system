@@ -8,12 +8,15 @@ import dqcs.dataqualityservice.api.dto.GenericEvent;
 import dqcs.dataqualityservice.api.dto.ValidationResultDto;
 import dqcs.dataqualityservice.application.BatchValidationService;
 import dqcs.dataqualityservice.application.GrpcValidationService;
+import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;
 import dqcs.dataqualityservice.infrastructure.entity.Expectation;
 import dqcs.dataqualityservice.infrastructure.prometheus.DataQualityMetricsPusher;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;
 import dqcs.dataqualityservice.infrastructure.repository.ExpectationRepository;
 import dqcs.dataqualityservice.infrastructure.repository.ValidationResultRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ import java.util.*;
 @Service
 public class BatchValidationServiceImpl implements BatchValidationService {
 
+    private final Logger logger = LoggerFactory.getLogger(BatchValidationServiceImpl.class);
 
     private final DataSourceRepository dataSourceRepository;
     private final ExpectationRepository expectationRepository;
@@ -42,8 +46,12 @@ public class BatchValidationServiceImpl implements BatchValidationService {
 
     @Override
     public ValidationResultDto validate(String topic, List<GenericEvent> events) {
-        UUID dataSourceId = dataSourceRepository.findByName(topic).map(DataSource::getId).orElseThrow(() -> new RuntimeException("DataSource not found"));
+        logger.info("[validate] Starting batch validation by topic: {}", topic);
 
+        UUID dataSourceId = dataSourceRepository.findByName(topic).map(DataSource::getId)
+                .orElseThrow(() -> new DataSourceNotFoundException("DataSource with topic '" + topic + "' not found"));
+
+        logger.debug("[validate] Number of events received: {}", events.size());
 
         List<Map<String, Object>> rows = events.stream()
                 .map(GenericEvent::getPayload)
@@ -54,8 +62,12 @@ public class BatchValidationServiceImpl implements BatchValidationService {
         ValidationResultDto resultDto = mapToDto(validationResponse, expectationRepository.findAllByFieldDataSourceIdAndEnabledTrue(dataSourceId));
 
         UUID eventId = UUID.randomUUID();
+
         validationResultRepository.saveValidationCells(eventId, topic, rows, resultDto);
+        logger.info("[validate] Validation results saved. Pushing metrics...");
+
         dataQualityMetricsPusher.push(topic, resultDto.results(), rows.size());
+        logger.info("[validate] Metrics pushed successfully!");
 
         return resultDto;
     }

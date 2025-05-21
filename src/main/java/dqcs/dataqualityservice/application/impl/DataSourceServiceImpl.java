@@ -3,6 +3,8 @@ package dqcs.dataqualityservice.application.impl;
 import dqcs.dataqualityservice.api.dto.DataSourceCreateRequest;
 import dqcs.dataqualityservice.api.dto.DataSourceDto;
 import dqcs.dataqualityservice.application.DataSourceService;
+import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
+import dqcs.dataqualityservice.application.exception.FieldNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;
 import org.slf4j.Logger;
@@ -42,6 +44,11 @@ public class DataSourceServiceImpl implements DataSourceService {
     @Override
     public void delete(UUID id) {
         logger.info("[delete] Deleting DataSource");
+
+        if (!dataSourceRepository.existsById(id)) {
+            throw new DataSourceNotFoundException("Data Source with id " + id + " not found");
+        }
+
         dataSourceRepository.deleteById(id);
     }
 
@@ -49,7 +56,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     public DataSourceDto get(UUID id) {
         logger.info("[get] Retrieving DataSource");
         DataSource ds = dataSourceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("DataSource not found"));
+                .orElseThrow(() -> new DataSourceNotFoundException("DataSource with id " + id + " not found"));
 
         return mapToDto(ds);
     }

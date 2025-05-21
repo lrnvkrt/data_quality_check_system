@@ -2,6 +2,7 @@ package dqcs.dataqualityservice.application.impl;
 
 import dqcs.dataqualityservice.api.dto.DataSourceCreateRequest;
 import dqcs.dataqualityservice.api.dto.DataSourceDto;
+import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,6 +64,8 @@ class DataSourceServiceImplTest {
     @Test
     @DisplayName("delete() should call repository to delete by ID")
     void shouldDeleteDataSource() {
+        when(dataSourceRepository.existsById(dataSourceId)).thenReturn(true);
+
         dataSourceService.delete(dataSourceId);
         verify(dataSourceRepository).deleteById(dataSourceId);
     }
@@ -90,8 +93,7 @@ class DataSourceServiceImplTest {
         when(dataSourceRepository.findById(dataSourceId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> dataSourceService.get(dataSourceId))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("DataSource not found");
+                .isInstanceOf(DataSourceNotFoundException.class);
     }
 
     @Test

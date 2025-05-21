@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dqcs.dataqualityservice.api.dto.ExpectationCreateRequest;
 import dqcs.dataqualityservice.api.dto.ExpectationDto;
 import dqcs.dataqualityservice.application.ExpectationService;
+import dqcs.dataqualityservice.application.exception.*;
 import dqcs.dataqualityservice.infrastructure.entity.Expectation;
 import dqcs.dataqualityservice.infrastructure.entity.ExpectationCatalog;
 import dqcs.dataqualityservice.infrastructure.entity.Field;
@@ -48,30 +49,30 @@ public class ExpectationServiceImpl implements ExpectationService {
         logger.info("[createExpectation] Creating expectation");
 
         Field field = fieldRepository.findById(fieldId).orElseThrow(
-                () -> new IllegalArgumentException("Field not found")
+                () ->  new FieldNotFoundException("Field with id " + fieldId + " not found")
         );
 
         ExpectationCatalog catalog = catalogRepository.findById(request.expectationTypeId()).orElseThrow(
-                () -> new IllegalArgumentException("Catalog not found")
+                () -> new ExpectationCatalogNotFoundException("Catalog with id " + request.expectationTypeId() + " not found")
         );
 
         Set<String> allowed = Set.copyOf(catalog.getAllowedKwargs() != null ? catalog.getAllowedKwargs(): List.of());
         Set<String> provided = request.kwargs() != null ? request.kwargs().keySet() : Set.of();
 
         if (!allowed.containsAll(provided)) {
-            throw new IllegalArgumentException("Provided kwargs are not allowed: " + provided.stream()
+            throw new InvalidKwargsException("Provided kwargs are not allowed: " + provided.stream()
                     .filter(kwarg -> !allowed.contains(kwarg)).toList());
         }
 
         if (catalog.isRequiresNumeric()) {
             String type = field.getDataType().toLowerCase();
             if (!type.contains("int") && !type.contains("float") && !type.contains("double") && !type.contains("long")) {
-                throw new IllegalArgumentException("Type not supported: " + type);
+                throw new InvalidFieldTypeException("Type not supported: " + type);
             }
         }
 
         if (request.rowCondition() != null && !request.rowCondition().isBlank() && !catalog.isSupportsRowCondition()) {
-            throw new IllegalArgumentException("Condition not supported: " + request.rowCondition());
+            throw new InvalidKwargsException("Condition not supported: " + request.rowCondition());
         }
 
         Expectation expectation = new Expectation();
@@ -88,7 +89,7 @@ public class ExpectationServiceImpl implements ExpectationService {
         try {
             expectation.setKwargs(objectMapper.writeValueAsString(request.kwargs()));
         } catch (Exception e) {
-            throw new IllegalArgumentException("Kwargs could not be serialized to json: " + request.kwargs());
+            throw new InvalidKwargsException("Kwargs could not be serialized to json: " + request.kwargs());
         }
 
         return expectationRepository.save(expectation).getId();
@@ -106,13 +107,18 @@ public class ExpectationServiceImpl implements ExpectationService {
     public ExpectationDto getExpectation(UUID expectationId) {
         logger.info("[getExpectation] Getting expectation: {}", expectationId);
         return expectationRepository.findById(expectationId).map(this::mapToDto).orElseThrow(
-                () -> new IllegalArgumentException("Expectation not found")
+                () -> new ExpectationNotFoundException("Expectation with id " + expectationId + " not found")
         );
     }
 
     @Override
     public void deleteExpectation(UUID expectationId) {
         logger.info("[deleteExpectation] Deleting expectation: {}", expectationId);
+
+        if (!expectationRepository.existsById(expectationId)) {
+            throw new ExpectationNotFoundException("Expectation with id " + expectationId + " not found");
+        }
+
         expectationRepository.deleteById(expectationId);
     }
 
@@ -120,7 +126,7 @@ public class ExpectationServiceImpl implements ExpectationService {
     public void toggleExpectation(UUID expectationId) {
         logger.info("[toggleExpectation] Updating expectation enabled: {}", expectationId);
         Expectation expectation = expectationRepository.findById(expectationId).orElseThrow(
-                () -> new IllegalArgumentException("Expectation not found")
+                () -> new ExpectationNotFoundException("Expectation with id " + expectationId + " not found")
         );
 
         expectation.setEnabled(!expectation.isEnabled());

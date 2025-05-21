@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dqcs.dataqualityservice.api.dto.ExpectationCreateRequest;
 import dqcs.dataqualityservice.api.dto.ExpectationDto;
+import dqcs.dataqualityservice.application.exception.*;
 import dqcs.dataqualityservice.infrastructure.entity.Expectation;
 import dqcs.dataqualityservice.infrastructure.entity.ExpectationCatalog;
 import dqcs.dataqualityservice.infrastructure.entity.Field;
@@ -100,13 +101,13 @@ class ExpectationServiceImplTest {
         UUID fieldId = UUID.randomUUID();
         when(fieldRepository.findById(fieldId)).thenReturn(Optional.empty());
 
+
         ExpectationCreateRequest req = new ExpectationCreateRequest(
                 UUID.randomUUID(), Map.of(), "", Severity.CRITICAL.toString(), null, false
         );
 
         assertThatThrownBy(() -> service.createExpectation(fieldId, req))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Field not found");
+                .isInstanceOf(FieldNotFoundException.class);
     }
 
     @Test
@@ -120,8 +121,7 @@ class ExpectationServiceImplTest {
         );
 
         assertThatThrownBy(() -> service.createExpectation(fieldId, req))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Catalog not found");
+                .isInstanceOf(ExpectationCatalogNotFoundException.class);
     }
 
     @Test
@@ -136,8 +136,7 @@ class ExpectationServiceImplTest {
         );
 
         assertThatThrownBy(() -> service.createExpectation(fieldId, req))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Provided kwargs are not allowed");
+                .isInstanceOf(InvalidKwargsException.class);
     }
 
     @Test
@@ -154,8 +153,7 @@ class ExpectationServiceImplTest {
         );
 
         assertThatThrownBy(() -> service.createExpectation(stringField.getId(), req))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Type not supported");
+                .isInstanceOf(InvalidFieldTypeException.class);
     }
 
     @Test
@@ -169,8 +167,7 @@ class ExpectationServiceImplTest {
         );
 
         assertThatThrownBy(() -> service.createExpectation(validField.getId(), req))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Condition not supported");
+                .isInstanceOf(InvalidKwargsException.class);
     }
 
     @Test
@@ -204,13 +201,15 @@ class ExpectationServiceImplTest {
         when(expectationRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getExpectation(id))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Expectation not found");
+                .isInstanceOf(ExpectationNotFoundException.class);
     }
 
     @Test
     void deleteExpectation_invokesRepository() {
         UUID id = UUID.randomUUID();
+
+        when(expectationRepository.existsById(id)).thenReturn(true);
+
         service.deleteExpectation(id);
         verify(expectationRepository).deleteById(id);
     }

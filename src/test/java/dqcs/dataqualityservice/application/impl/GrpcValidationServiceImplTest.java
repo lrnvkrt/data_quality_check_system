@@ -3,6 +3,7 @@ package dqcs.dataqualityservice.application.impl;
 import app.grpc.Validation;
 import app.grpc.ValidationServiceGrpc;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.*;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;
 import dqcs.dataqualityservice.infrastructure.repository.ExpectationRepository;
@@ -39,8 +40,7 @@ class GrpcValidationServiceImplTest {
         when(dataSourceRepository.findById(dataSourceId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.validate(dataSourceId, List.of()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid dataSource id");
+                .isInstanceOf(DataSourceNotFoundException.class);
     }
 
     @Test

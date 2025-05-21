@@ -3,6 +3,8 @@ package dqcs.dataqualityservice.application.impl;
 import dqcs.dataqualityservice.api.dto.FieldCreateRequest;
 import dqcs.dataqualityservice.api.dto.FieldDto;
 import dqcs.dataqualityservice.application.FieldService;
+import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
+import dqcs.dataqualityservice.application.exception.FieldNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;
 import dqcs.dataqualityservice.infrastructure.entity.Field;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;
@@ -33,7 +35,7 @@ public class FieldServiceImpl implements FieldService {
         logger.info("[addField] Creating new Field");
 
         DataSource dataSource = dataSourceRepository.findById(dataSourceId)
-                .orElseThrow(() -> new RuntimeException("DataSource not found"));
+                .orElseThrow(() -> new DataSourceNotFoundException("DataSource with id " + dataSourceId + " not found"));
 
         Field field = new Field();
         field.setId(UUID.randomUUID());
@@ -56,12 +58,17 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public FieldDto getField(UUID id) {
         logger.info("[getField] getting field by id {}", id);
-        return mapToDto(fieldRepository.findById(id).orElseThrow(() -> new RuntimeException("Field not found")));
+        return mapToDto(fieldRepository.findById(id).orElseThrow(() -> new FieldNotFoundException("Field with id " + id + " not found")));
     }
 
     @Override
     public void deleteField(UUID id) {
         logger.info("[deleteField] deleting field by id {}", id);
+
+        if (!fieldRepository.existsById(id)) {
+            throw new FieldNotFoundException("Field with id " + id + " not found");
+        }
+
         fieldRepository.deleteById(id);
     }
 

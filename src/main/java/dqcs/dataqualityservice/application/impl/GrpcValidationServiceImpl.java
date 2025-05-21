@@ -4,20 +4,23 @@ import app.grpc.Validation;
 import app.grpc.ValidationServiceGrpc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dqcs.dataqualityservice.application.GrpcValidationService;
+import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
+import dqcs.dataqualityservice.application.exception.InvalidKwargsException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;
 import dqcs.dataqualityservice.infrastructure.entity.Expectation;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;
 import dqcs.dataqualityservice.infrastructure.repository.ExpectationRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 @Service
 public class GrpcValidationServiceImpl implements GrpcValidationService {
 
-    private final Logger logger = Logger.getLogger(GrpcValidationServiceImpl.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(GrpcValidationServiceImpl.class);
 
     private final DataSourceRepository dataSourceRepository;
     private final ExpectationRepository expectationRepository;
@@ -35,8 +38,9 @@ public class GrpcValidationServiceImpl implements GrpcValidationService {
 
     @Override
     public Validation.ValidationResponse validate(UUID dataSourceId, List<Map<String, Object>> rows) {
+        logger.info("[validate] Start gRPC validation for data source: {}", dataSourceId);
         DataSource dataSource = dataSourceRepository.findById(dataSourceId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid dataSource id: " + dataSourceId));
+                .orElseThrow(() -> new DataSourceNotFoundException("DataSource with id " + dataSourceId + " not found"));
 
         List<Expectation> expectations = expectationRepository.findAllByFieldDataSourceIdAndEnabledTrue(dataSourceId);
 
@@ -50,6 +54,7 @@ public class GrpcValidationServiceImpl implements GrpcValidationService {
             requestBuilder.addData(record);
         }
 
+        logger.debug("[validate] Constructed {} records for validation", rows.size());
 
         Validation.ExpectationSuite.Builder suite = Validation.ExpectationSuite.newBuilder()
                 .setExpectationSuiteName("ds_" + dataSourceId);
@@ -90,11 +95,17 @@ public class GrpcValidationServiceImpl implements GrpcValidationService {
             suite.addExpectations(expectationGrpc.build());
         }
 
+        logger.debug("[validate] Built expectation suite with {} expectations", expectations.size());
+
         requestBuilder.setExpectationSuite(suite.build());
 
         Validation.ValidationRequest validationRequest = requestBuilder.build();
+        logger.info("[validate] Sending request to gRPC service...");
 
-        return validationServiceBlockingStub.validate(validationRequest);
+        Validation.ValidationResponse response = validationServiceBlockingStub.validate(validationRequest);
+        logger.info("[validate] Received response from gRPC service. Success: {}", response.getSuccess());
+
+        return response;
     }
 
     private Validation.FieldValue toFieldValue(Object value) {
@@ -130,7 +141,7 @@ public class GrpcValidationServiceImpl implements GrpcValidationService {
         try {
             return objectMapper.readValue(json, Map.class);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid JSON in kwargs", e);
+            throw new InvalidKwargsException("Invalid JSON in kwargs: " + e.getMessage());
         }
     }
 }

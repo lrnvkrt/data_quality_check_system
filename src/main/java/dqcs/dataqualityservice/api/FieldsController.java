@@ -3,6 +3,7 @@ package dqcs.dataqualityservice.api;
 import dqcs.dataqualityservice.api.dto.FieldCreateRequest;
 import dqcs.dataqualityservice.api.dto.FieldDto;
 import dqcs.dataqualityservice.application.FieldService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class FieldsController {
 
     @PostMapping
     public UUID addField(
+            @Valid
             @PathVariable UUID dataSourceId,
             @RequestBody FieldCreateRequest request
     ) {
