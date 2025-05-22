@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.api.validation.validator;
 
-import dqcs.dataqualityservice.api.dto.ExpectationCreateRequest;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationCreateRequest;
 import dqcs.dataqualityservice.api.validation.annotation.ValidRowCondition;
 import dqcs.dataqualityservice.infrastructure.entity.ExpectationCatalog;
 import dqcs.dataqualityservice.infrastructure.repository.ExpectationCatalogRepository;

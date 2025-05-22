@@ -1,7 +1,7 @@
 package dqcs.dataqualityservice.application;
 
 import dqcs.dataqualityservice.api.dto.GenericEvent;
-import dqcs.dataqualityservice.api.dto.ValidationResultDto;
+import dqcs.dataqualityservice.api.dto.expectation.ValidationResultDto;
 
 import java.util.List;
 

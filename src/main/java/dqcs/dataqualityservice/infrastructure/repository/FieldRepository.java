@@ -1,6 +1,5 @@
 package dqcs.dataqualityservice.infrastructure.repository;
 
-import dqcs.dataqualityservice.api.dto.FieldDto;
 import dqcs.dataqualityservice.infrastructure.entity.Field;
 import org.springframework.data.jpa.repository.JpaRepository;
 

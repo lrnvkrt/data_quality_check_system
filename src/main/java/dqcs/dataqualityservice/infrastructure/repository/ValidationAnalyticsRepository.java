@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.infrastructure.repository;
 
-import dqcs.dataqualityservice.api.dto.*;
+import dqcs.dataqualityservice.api.dto.analytics.*;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package dqcs.dataqualityservice.application.impl;
 
-import dqcs.dataqualityservice.api.dto.DataSourceCreateRequest;
-import dqcs.dataqualityservice.api.dto.DataSourceDto;
+import dqcs.dataqualityservice.api.dto.datasource.DataSourceCreateRequest;
+import dqcs.dataqualityservice.api.dto.datasource.DataSourceDto;
 import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;
 import dqcs.dataqualityservice.infrastructure.repository.DataSourceRepository;

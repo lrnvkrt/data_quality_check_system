@@ -31,3 +31,8 @@ grpc:
 metrics:
   pushgateway:
     host: ${PUSHGATEWAY_HOST}
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}

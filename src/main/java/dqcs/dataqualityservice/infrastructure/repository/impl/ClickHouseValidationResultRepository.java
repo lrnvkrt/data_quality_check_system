@@ -1,7 +1,7 @@
 package dqcs.dataqualityservice.infrastructure.repository.impl;
 
-import dqcs.dataqualityservice.api.dto.ExpectationResultDto;
-import dqcs.dataqualityservice.api.dto.ValidationResultDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationResultDto;
+import dqcs.dataqualityservice.api.dto.expectation.ValidationResultDto;
 import dqcs.dataqualityservice.config.clickhouse.ClickhouseBatchPreparedStatementSetter;
 import dqcs.dataqualityservice.infrastructure.repository.ValidationResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;

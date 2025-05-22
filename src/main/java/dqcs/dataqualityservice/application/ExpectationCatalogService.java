@@ -1,7 +1,6 @@
 package dqcs.dataqualityservice.application;
 
-import dqcs.dataqualityservice.api.dto.ExpectationCatalogDto;
-import dqcs.dataqualityservice.infrastructure.entity.ExpectationCatalog;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationCatalogDto;
 
 import java.util.List;
 

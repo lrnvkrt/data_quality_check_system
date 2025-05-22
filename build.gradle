@@ -64,6 +64,9 @@ dependencies {
 
     // validation
     implementation "org.springframework.boot:spring-boot-starter-validation"
+
+    // rest api doc
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8"
 }
 
 tasks.named('test') {

@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.application.impl;
 
-import dqcs.dataqualityservice.api.dto.ExpectationCatalogDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationCatalogDto;
 import dqcs.dataqualityservice.application.ExpectationCatalogService;
 import dqcs.dataqualityservice.infrastructure.entity.ExpectationCatalog;
 import dqcs.dataqualityservice.infrastructure.repository.ExpectationCatalogRepository;

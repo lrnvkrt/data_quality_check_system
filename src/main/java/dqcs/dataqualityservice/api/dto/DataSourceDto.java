@@ -1,9 +1,0 @@
-package dqcs.dataqualityservice.api.dto;
-
-import java.util.UUID;
-
-public record DataSourceDto(
-        UUID id,
-        String name,
-        String description
-) {}

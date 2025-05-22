@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.infrastructure.prometheus.impl;
 
-import dqcs.dataqualityservice.api.dto.ExpectationResultDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationResultDto;
 import dqcs.dataqualityservice.infrastructure.prometheus.DataQualityMetricsPusher;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;

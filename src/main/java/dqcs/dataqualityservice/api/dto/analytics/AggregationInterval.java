@@ -1,10 +1,21 @@
-package dqcs.dataqualityservice.api.dto;
+package dqcs.dataqualityservice.api.dto.analytics;
 
-public enum AggregationInterval{
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Интервал агрегации для аналитики")
+public enum AggregationInterval {
+
+    @Schema(description = "Агрегация по минутам (1 минута)", example = "1 minute")
     MINUTELY("1 minute"),
+
+    @Schema(description = "Агрегация по часам (1 час)", example = "1 hour")
     HOURLY("1 hour"),
+
+    @Schema(description = "Агрегация по дням (1 день)", example = "1 day")
     DAILY("1 day"),
-    WEEKLY ("1 week");
+
+    @Schema(description = "Агрегация по неделям (1 неделя)", example = "1 week")
+    WEEKLY("1 week");
 
     private final String interval;
 

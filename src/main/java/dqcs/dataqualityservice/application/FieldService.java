@@ -1,7 +1,7 @@
 package dqcs.dataqualityservice.application;
 
-import dqcs.dataqualityservice.api.dto.FieldCreateRequest;
-import dqcs.dataqualityservice.api.dto.FieldDto;
+import dqcs.dataqualityservice.api.dto.field.FieldCreateRequest;
+import dqcs.dataqualityservice.api.dto.field.FieldDto;
 
 import java.util.List;
 import java.util.UUID;

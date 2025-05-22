@@ -2,8 +2,8 @@ package dqcs.dataqualityservice.application.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dqcs.dataqualityservice.api.dto.ExpectationCreateRequest;
-import dqcs.dataqualityservice.api.dto.ExpectationDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationCreateRequest;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationDto;
 import dqcs.dataqualityservice.application.ExpectationService;
 import dqcs.dataqualityservice.application.exception.*;
 import dqcs.dataqualityservice.infrastructure.entity.Expectation;

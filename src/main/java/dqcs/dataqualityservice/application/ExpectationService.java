@@ -1,7 +1,7 @@
 package dqcs.dataqualityservice.application;
 
-import dqcs.dataqualityservice.api.dto.ExpectationCreateRequest;
-import dqcs.dataqualityservice.api.dto.ExpectationDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationCreateRequest;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationDto;
 
 import java.util.List;
 import java.util.UUID;

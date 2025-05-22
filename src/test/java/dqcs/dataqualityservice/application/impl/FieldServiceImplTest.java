@@ -1,7 +1,7 @@
 package dqcs.dataqualityservice.application.impl;
 
-import dqcs.dataqualityservice.api.dto.FieldCreateRequest;
-import dqcs.dataqualityservice.api.dto.FieldDto;
+import dqcs.dataqualityservice.api.dto.field.FieldCreateRequest;
+import dqcs.dataqualityservice.api.dto.field.FieldDto;
 import dqcs.dataqualityservice.application.exception.DataSourceNotFoundException;
 import dqcs.dataqualityservice.application.exception.FieldNotFoundException;
 import dqcs.dataqualityservice.infrastructure.entity.DataSource;

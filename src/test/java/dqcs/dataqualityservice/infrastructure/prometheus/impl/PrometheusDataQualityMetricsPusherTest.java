@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.infrastructure.prometheus.impl;
 
-import dqcs.dataqualityservice.api.dto.ExpectationResultDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationResultDto;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.PushGateway;
 import org.junit.jupiter.api.BeforeEach;

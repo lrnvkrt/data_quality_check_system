@@ -1,7 +1,7 @@
 package dqcs.dataqualityservice.application;
 
-import dqcs.dataqualityservice.api.dto.DataSourceCreateRequest;
-import dqcs.dataqualityservice.api.dto.DataSourceDto;
+import dqcs.dataqualityservice.api.dto.datasource.DataSourceCreateRequest;
+import dqcs.dataqualityservice.api.dto.datasource.DataSourceDto;
 
 import java.util.List;
 import java.util.UUID;

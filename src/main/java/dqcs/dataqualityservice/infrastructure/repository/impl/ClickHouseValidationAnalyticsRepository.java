@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.infrastructure.repository.impl;
 
-import dqcs.dataqualityservice.api.dto.*;
+import dqcs.dataqualityservice.api.dto.analytics.*;
 import dqcs.dataqualityservice.infrastructure.repository.ValidationAnalyticsRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

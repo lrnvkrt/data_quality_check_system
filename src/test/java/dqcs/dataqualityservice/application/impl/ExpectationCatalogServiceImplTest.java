@@ -2,7 +2,7 @@ package dqcs.dataqualityservice.application.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dqcs.dataqualityservice.api.dto.ExpectationCatalogDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationCatalogDto;
 import dqcs.dataqualityservice.infrastructure.entity.ExpectationCatalog;
 import dqcs.dataqualityservice.infrastructure.repository.ExpectationCatalogRepository;
 import org.junit.jupiter.api.DisplayName;

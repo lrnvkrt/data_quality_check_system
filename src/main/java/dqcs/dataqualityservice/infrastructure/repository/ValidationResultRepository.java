@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.infrastructure.repository;
 
-import dqcs.dataqualityservice.api.dto.ValidationResultDto;
+import dqcs.dataqualityservice.api.dto.expectation.ValidationResultDto;
 
 import java.util.List;
 import java.util.Map;

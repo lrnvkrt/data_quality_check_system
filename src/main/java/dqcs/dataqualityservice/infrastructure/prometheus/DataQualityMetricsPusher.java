@@ -1,6 +1,6 @@
 package dqcs.dataqualityservice.infrastructure.prometheus;
 
-import dqcs.dataqualityservice.api.dto.ExpectationResultDto;
+import dqcs.dataqualityservice.api.dto.expectation.ExpectationResultDto;
 
 import java.util.List;
 
