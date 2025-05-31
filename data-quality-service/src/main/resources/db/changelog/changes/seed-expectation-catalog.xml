@@ -1,0 +1,54 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="1-recreate-expectation-catalog" author="dataqualityservice" runInTransaction="false">
+        <sql>
+            DROP TABLE IF EXISTS expectation_catalog CASCADE;
+        </sql>
+        <sql>
+            CREATE TABLE expectation_catalog (
+                                                 id   UUID PRIMARY KEY,
+                                                 code TEXT NOT NULL,
+                                                 name TEXT NOT NULL,
+                                                 description TEXT,
+                                                 allowed_kwargs TEXT[],
+                                                 allowed_kwarg_types JSONB,
+                                                 default_kwargs JSONB,
+                                                 requires_numeric BOOLEAN DEFAULT FALSE,
+                                                 supports_row_condition BOOLEAN DEFAULT TRUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="2-seed-expectation-catalog" author="dataqualityservice" context="data" runInTransaction="false">
+        <sql>
+            INSERT INTO expectation_catalog (
+                id, code, name, description,
+                allowed_kwargs, allowed_kwarg_types,
+                default_kwargs, requires_numeric, supports_row_condition
+            )
+            VALUES
+                (gen_random_uuid(), 'expect_column_value_lengths_to_be_between', 'Длина строки в диапазоне', 'Проверяет, что длина значения строки находится в указанном диапазоне.', ARRAY['min_value', 'max_value'], '{"min_value": "int", "max_value": "int"}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_not_be_null', 'Поле не должно быть null', 'Проверяет, что ни одно значение не является null.', ARRAY[]::TEXT[], '{}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_be_null', 'Поле должно быть null', 'Проверяет, что все значения поля являются null.', ARRAY[]::TEXT[], '{}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_be_in_set', 'Значение из допустимого множества', 'Проверяет, что значения поля входят в заданное множество.', ARRAY['value_set'], '{"value_set": "list"}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_not_be_in_set', 'Значение вне запрещённого множества', 'Проверяет, что значения поля не входят в запрещённое множество.', ARRAY['value_set'], '{"value_set": "list"}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'Значение соответствует шаблону', 'Проверяет, что значения соответствуют регулярному выражению.', ARRAY['regex'], '{"regex": "string"}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_be_between', 'Значение в числовом диапазоне', 'Проверяет, что значения числового поля находятся в указанном диапазоне.', ARRAY['min_value', 'max_value', 'strict_min', 'strict_max'], '{"min_value": "float", "max_value": "float", "strict_min": "bool", "strict_max": "bool"}', '{"result_format": "COMPLETE"}', true, true),
+                (gen_random_uuid(), 'expect_column_values_to_be_of_type', 'Тип значения', 'Проверяет, что значения соответствуют указанному типу.', ARRAY['type_'], '{"type_": "string"}', '{"result_format": "COMPLETE"}', false, false),
+                (gen_random_uuid(), 'expect_column_values_to_match_strftime_format', 'Дата/время по формату', 'Проверяет, что строка является корректной датой в заданном формате.', ARRAY['strftime_format'], '{"strftime_format": "string"}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_to_exist', 'Поле существует', 'Проверяет наличие колонки в данных.', ARRAY[]::TEXT[], '{}', '{"result_format": "COMPLETE"}', false, false),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'Email-адрес', 'Проверяет, что значения соответствуют базовому шаблону email.', ARRAY[]::TEXT[], '{}', '{"regex": "^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$", "result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'Номер телефона', 'Проверяет, что значения соответствуют международному номеру телефона (E.164).', ARRAY[]::TEXT[], '{}', '{"regex": "^\\+?[1-9]\\d{1,14}$", "result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'ИНН (юр. лицо)', 'Проверяет, что значение соответствует ИНН юридического лица (10 цифр).', ARRAY[]::TEXT[], '{}', '{"regex": "^\\d{10}$", "result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'ИНН (физ. лицо)', 'Проверяет, что значение соответствует ИНН физического лица (12 цифр).', ARRAY[]::TEXT[], '{}', '{"regex": "^\\d{12}$", "result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'Серия и номер паспорта', 'Проверяет, что значение соответствует серии и номеру паспорта РФ в формате "XXXX XXXXXX".', ARRAY[]::TEXT[], '{}', '{"regex": "^\\d{4}\\s\\d{6}$", "result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'СНИЛС', 'Проверяет, что значение соответствует СНИЛС в формате XXX-XXX-XXX XX.', ARRAY[]::TEXT[], '{}', '{"regex": "^\\\\d{3}-\\\\d{3}-\\\\d{3}\\\\s\\\\d{2}$", "result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_ipv4', 'IPv4-адрес', 'Проверяет, что значения представляют собой корректные IPv4-адреса.', ARRAY[]::TEXT[], '{}', '{"result_format": "COMPLETE"}', false, true),
+                (gen_random_uuid(), 'expect_column_values_to_match_regex', 'IPv6-адрес', 'Проверяет, что значения представляют собой корректные IPv6-адреса.', ARRAY[]::TEXT[], '{}', '{"regex": "^(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}$", "result_format": "COMPLETE"}', false, true);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

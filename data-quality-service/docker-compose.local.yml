@@ -1,0 +1,63 @@
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: local-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.3
+    container_name: local-clickhouse
+    restart: unless-stopped
+    ports:
+      - "${CLICKHOUSE_PORT}:8123"
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+    volumes:
+      - ch_data:/var/lib/clickhouse
+      - ch_logs:/var/log/clickhouse-server
+      - ./clickhouse-init:/docker-entrypoint-initdb.d
+
+  prometheus:
+    container_name: local-prometheus
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: local-push-gateway
+    ports:
+      - "9091:9091"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: default
+      GF_SECURITY_ADMIN_PASSWORD: default
+    depends_on:
+      - prometheus
+
+volumes:
+  grafana-storage:
+  pg_data:
+  ch_data:
+  ch_logs:

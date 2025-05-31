@@ -1,0 +1,156 @@
+### Получить список доступных ожиданий
+GET http://localhost:8080/expectations/catalog
+
+### Создать новый DataSource
+POST http://localhost:8080/datasources
+Content-Type: application/json
+
+{
+  "name": "test.topic",
+  "description": "Тестовый топик"
+}
+
+### Получить список DataSource
+GET http://localhost:8080/datasources
+
+
+### Удалить DataSource
+DELETE http://localhost:8080/datasources/b09ff6e6-bb4a-4d19-abb8-b9759f6ac148
+
+
+### Создание поля amount
+POST http://localhost:8080/datasources/c0c8d263-5fd5-4019-aff8-a5a9dcc256c7/fields
+Content-Type: application/json
+
+{
+    "name": "amount",
+    "dataType": "int"
+}
+
+### Создание поля count
+POST http://localhost:8080/datasources/c0c8d263-5fd5-4019-aff8-a5a9dcc256c7/fields
+Content-Type: application/json
+
+{
+  "name": "count",
+  "dataType": "int"
+}
+
+### Созадние поле телефонного номера
+POST http://localhost:8080/datasources/c0c8d263-5fd5-4019-aff8-a5a9dcc256c7/fields
+Content-Type: application/json
+
+{
+  "name": "phone",
+  "dataType": "string"
+}
+
+### Получение полей по ds
+GET http://localhost:8080/datasources/57411f0e-813a-4f4f-920d-636203b7e44a/fields
+
+### Создать expectation для field
+POST http://localhost:8080/fields/56210172-c683-435e-b577-4c5c773399fe/expectations
+Content-Type: application/json
+
+{
+  "expectationTypeId": "0527be69-3b5b-4168-a133-06a967e716a9",
+  "description": "Тестовое назнчение для телефончика",
+  "severity": "INFO",
+  "enabled": true
+}
+
+### Создать expectation для field с kwargs
+POST http://localhost:8080/fields/5c4173da-19b3-4c23-98ec-545e61fb956f/expectations
+Content-Type: application/json
+
+{
+  "expectationTypeId": "a115ff19-bf20-4a40-8ad0-3b4d5da8bfa5",
+  "description": "Тестовое назнчение для between",
+  "severity": "INFO",
+  "kwargs": {
+    "min_value": 1
+  },
+  "enabled": true
+}
+
+### Создать expectation для field count с kwargs
+POST http://localhost:8080/fields/87d7f1d6-e136-4847-b00c-7db2b61351c4/expectations
+Content-Type: application/json
+
+{
+  "expectationTypeId": "a115ff19-bf20-4a40-8ad0-3b4d5da8bfa5",
+  "description": "Тестовое назнчение для between",
+  "severity": "INFO",
+  "kwargs": {
+    "min_value": 10
+  },
+  "enabled": true
+}
+
+
+### Валидация батча
+POST http://localhost:8080/batch/ecom.order.placed
+Content-Type: application/json
+
+[
+  {
+    "topic": "ecom.order.placed",
+    "payload": {
+      "userId": "9d0da8b5-2dcb-46a6-ba70-63a5bff3c3e9",
+      "createdAt": 1747170987.0629097,
+      "quantity": -10,
+      "totalAmount": 25.480760230559888,
+      "shippingAddress": {
+        "country": "Germany",
+        "city": "Berlin",
+        "postalCode": "INVALID",
+        "street": "Alexanderplatz 1"
+      }
+    }
+  },
+  {
+    "topic": "ecom.order.placed",
+    "payload": {
+      "userId": "12345678-aaaa-bbbb-cccc-1234567890ab",
+      "createdAt": 1747170990.123456,
+      "items": [
+        {
+          "productId": "abcdef12-3456-7890-abcd-ef1234567890",
+          "quantity": 1,
+          "unitPrice": 100.0
+        }
+      ],
+      "totalAmount": 100.0,
+      "shippingAddress": {
+        "country": "Germany",
+        "city": "Munich",
+        "postalCode": "80331",
+        "street": "Marienplatz 1"
+      }
+    }
+  }
+]
+
+
+
+### Список всех топиков с оценкой общего качества данных
+GET http://localhost:8080/analytics/topics
+
+
+### Статистика ошибок по каждому полю и правилу в конретном топике
+GET http://localhost:8080/analytics/topics/ecom.order.placed/fields
+
+### Показывает динамику ошибок по топику
+GET http://localhost:8080/analytics/topics/test.topic/trend?interval=hourly
+
+### Возвращает примеры сломанных значений в топике
+GET http://localhost:8080/analytics/topics/test.topic/examples
+
+### Возвращает список всех правил с оценкой их эффективности
+GET http://localhost:8080/analytics/rules
+
+### Показывает как конкретное правило работает во времени
+GET http://localhost:8080/analytics/rules/2d31caed-215c-44c6-8adc-ca2921f80608/trend?interval=hourly
+
+### Показывает конкретные значения которые регулярно проваливаются под конкретным правилом
+GET http://localhost:8080/analytics/rules/2d31caed-215c-44c6-8adc-ca2921f80608/examples
